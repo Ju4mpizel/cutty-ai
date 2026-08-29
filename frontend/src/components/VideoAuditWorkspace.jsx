@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 import MascotCard from "./MascotCard";
 import EditingKitCard from "./EditingKitCard";
 
@@ -68,13 +70,13 @@ const EyeClosedIcon = () => (
 
 const MOOD_COLORS = {
   happy:
-    "bg-emerald-500 border-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]",
-  bored: "bg-amber-500 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]",
+    "bg-emerald-500 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.9)]",
+  bored: "bg-amber-500 border-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.9)]",
   confused:
-    "bg-indigo-500 border-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]",
-  shocked: "bg-rose-500 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]",
+    "bg-indigo-500 border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.9)]",
+  shocked: "bg-rose-500 border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.9)]",
   encouraging:
-    "bg-cyan-500 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]",
+    "bg-cyan-500 border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.9)]",
   analyzing: "bg-zinc-500 border-zinc-400",
 };
 
@@ -155,6 +157,17 @@ const LIVE_SCAN_FEEDBACK = {
   ],
 };
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 25, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 280, damping: 24 },
+  },
+  exit: { opacity: 0, y: -20, scale: 0.95, transition: { duration: 0.2 } },
+};
+
 export default function VideoAuditWorkspace({
   videoFile,
   videoUrl,
@@ -204,6 +217,14 @@ export default function VideoAuditWorkspace({
 
       const data = await res.json();
       setAuditData(data);
+
+      // Disparar confetti al terminar con éxito
+      confetti({
+        particleCount: data.viralityScore >= 70 ? 100 : 50,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#10B981", "#FFE600", "#38BDF8", "#F43F5E"],
+      });
 
       if (videoRef.current) {
         videoRef.current.pause();
@@ -292,24 +313,39 @@ ${auditData.timelineFeedback
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 sm:px-4 py-4">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3 }}
+      className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4"
+    >
       {/* 1. TOP CONTROL BAR */}
-      <div className="flex flex-wrap items-center justify-between bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-3xl shadow-[4px_4px_0px_rgba(0,0,0,1)] gap-3">
-        <button
+      <motion.div
+        layout
+        className="flex flex-wrap items-center justify-between bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-3xl shadow-[4px_4px_0px_rgba(0,0,0,1)] gap-3"
+      >
+        <motion.button
+          whileHover={{ scale: 1.03, x: -2 }}
+          whileTap={{ scale: 0.96 }}
           onClick={onReset}
-          className="flex items-center gap-2 text-xs font-mono font-bold text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 px-4 py-2 rounded-xl border border-zinc-700 transition-all cursor-pointer shadow-sm active:translate-x-0.5 active:translate-y-0.5"
+          className="flex items-center gap-2 text-xs font-mono font-bold text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 px-4 py-2 rounded-xl border border-zinc-700 transition-colors cursor-pointer shadow-sm"
         >
           ← {lang === "es" ? "Subir otro clip" : "Upload another clip"}
-        </button>
+        </motion.button>
 
         <div className="flex items-center gap-3 ml-auto">
           <span className="text-xs text-zinc-400 font-mono hidden md:inline truncate max-w-xs bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
             📄 {videoFile?.name}
           </span>
           {auditData && (
-            <button
+            <motion.button
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleCopyFullReport}
-              className="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-2 rounded-xl text-xs font-black font-mono uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+              className="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-2 rounded-xl text-xs font-black font-mono uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_#000] transition-colors cursor-pointer"
             >
               {copiedReport
                 ? lang === "es"
@@ -318,15 +354,21 @@ ${auditData.timelineFeedback
                 : lang === "es"
                   ? "📋 Copiar Reporte"
                   : "📋 Copy Full Report"}
-            </button>
+            </motion.button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* 2. TOP BENTO GRID: 3 COLUMNS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* COLUMN 1 (4 COLS): 9:16 VIDEO PLAYER */}
-        <div className="lg:col-span-4 bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-4 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
+        <motion.div
+          layout
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          className="lg:col-span-4 bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-4 shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+        >
           <div className="w-full max-w-[280px] bg-black rounded-2xl overflow-hidden border-2 border-zinc-800 shadow-2xl relative aspect-[9/16] flex items-center justify-center">
             <video
               ref={videoRef}
@@ -338,7 +380,7 @@ ${auditData.timelineFeedback
             />
             {isAuditing && (
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-emerald-500/20 via-transparent to-transparent animate-pulse border-b-2 border-emerald-400 flex items-start justify-center pt-3">
-                <span className="bg-emerald-950/90 text-emerald-300 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/40">
+                <span className="bg-emerald-950/90 text-emerald-300 font-mono text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/40 shadow-md">
                   AI SCANNING...
                 </span>
               </div>
@@ -364,8 +406,8 @@ ${auditData.timelineFeedback
             </div>
 
             <div className="relative w-full h-3.5 bg-zinc-950 rounded-full flex items-center cursor-pointer border border-zinc-800 overflow-visible">
-              <div
-                className="h-full bg-emerald-500 rounded-full transition-all duration-100 shadow-[0_0_10px_#10B981]"
+              <motion.div
+                className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_#10B981]"
                 style={{ width: `${progressPercent}%` }}
               />
               {auditData &&
@@ -375,64 +417,95 @@ ${auditData.timelineFeedback
                   const pinColor =
                     MOOD_COLORS[item.mascotReaction] || MOOD_COLORS.analyzing;
                   return (
-                    <button
+                    <motion.button
                       key={idx}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      whileHover={{ scale: 1.6 }}
                       onClick={() => seekTo(item.timestampSeconds)}
                       title={`00:${item.timestampSeconds}s - ${item.critique}`}
-                      className={`absolute w-3.5 h-3.5 rounded-full border-2 transform -translate-x-1/2 cursor-pointer transition-transform hover:scale-150 ${pinColor}`}
+                      className={`absolute w-3.5 h-3.5 rounded-full border-2 transform -translate-x-1/2 cursor-pointer ${pinColor}`}
                       style={{ left: `${pinPos}%` }}
                     />
                   );
                 })}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* COLUMN 2 (4 COLS): INTERACTIVE MASCOT CARD */}
+        {/* COLUMN 2 (4 COLS): MASCOTA INTERACTIVA + BRO ROAST */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          {!auditData && !isAuditing && (
-            <div className="bg-zinc-950 border-2 border-emerald-500/40 p-8 rounded-3xl text-center flex flex-col items-center shadow-[6px_6px_0px_rgba(16,185,129,0.3)] justify-center">
-              <img
-                src="/mascot/analyzing.png"
-                alt="Cutty"
-                className="w-28 h-28 object-contain mb-3 animate-bounce"
-                style={{ imageRendering: "pixelated" }}
-              />
-              <h3 className="text-base font-black uppercase text-white font-mono">
-                {lang === "es"
-                  ? "¿Listo para la auditoría?"
-                  : "Ready for audit?"}
-              </h3>
-              <p className="text-xs text-zinc-400 max-w-xs mt-1.5 mb-6 leading-relaxed">
-                {lang === "es"
-                  ? "Cutty inspeccionará ritmo, ganchos y audio con Gemini 3.5 Flash en Vertex AI."
-                  : "Cutty will inspect pacing, hooks, and audio with Gemini 3.5 Flash in Vertex AI."}
-              </p>
-              <button
-                onClick={handleUploadAndAudit}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs font-mono uppercase tracking-wider px-6 py-3.5 rounded-2xl border-2 border-black shadow-[3px_3px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer"
+          <AnimatePresence mode="wait">
+            {!auditData && !isAuditing && (
+              <motion.div
+                key="audit-ready-box"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="bg-zinc-950 border-2 border-emerald-500/40 p-8 rounded-3xl text-center flex flex-col items-center shadow-[6px_6px_0px_rgba(16,185,129,0.3)] justify-center"
               >
-                <SparklesIcon />{" "}
-                {lang === "es"
-                  ? "Iniciar Auditoría en Vivo"
-                  : "Start Live Audit"}
-              </button>
-            </div>
-          )}
+                <motion.img
+                  animate={{ y: [-4, 6, -4] }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 3,
+                    ease: "easeInOut",
+                  }}
+                  src="/mascot/analyzing.png"
+                  alt="Cutty"
+                  className="w-28 h-28 object-contain mb-3"
+                  style={{ imageRendering: "pixelated" }}
+                />
+                <h3 className="text-base font-black uppercase text-white font-mono">
+                  {lang === "es"
+                    ? "¿Listo para la auditoría?"
+                    : "Ready for audit?"}
+                </h3>
+                <p className="text-xs text-zinc-400 max-w-xs mt-1.5 mb-6 leading-relaxed">
+                  {lang === "es"
+                    ? "Cutty inspeccionará ritmo, ganchos y audio con Gemini 3.5 Flash en Vertex AI."
+                    : "Cutty will inspect pacing, hooks, and audio with Gemini 3.5 Flash in Vertex AI."}
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleUploadAndAudit}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs font-mono uppercase tracking-wider px-6 py-3.5 rounded-2xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-center gap-2 cursor-pointer"
+                >
+                  <SparklesIcon />{" "}
+                  {lang === "es"
+                    ? "Iniciar Auditoría en Vivo"
+                    : "Start Live Audit"}
+                </motion.button>
+              </motion.div>
+            )}
 
-          {(isAuditing || auditData) && (
-            <div className="bg-zinc-950 border-2 border-emerald-500/30 rounded-3xl p-4 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
-              <MascotCard
-                mood={currentMood}
-                score={auditData?.viralityScore || null}
-                currentTip={activeFeedback}
-                lang={lang}
-              />
-            </div>
-          )}
+            {(isAuditing || auditData) && (
+              <motion.div
+                key="mascot-active-box"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                className="bg-zinc-950 border-2 border-emerald-500/30 rounded-3xl p-4 shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+              >
+                <MascotCard
+                  mood={currentMood}
+                  score={auditData?.viralityScore || null}
+                  currentTip={activeFeedback}
+                  lang={lang}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {auditData && (
-            <div className="bg-zinc-950 border-2 border-amber-500/40 p-4 rounded-3xl shadow-[6px_6px_0px_rgba(245,158,11,0.2)] flex flex-col gap-2.5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-zinc-950 border-2 border-amber-500/40 p-4 rounded-3xl shadow-[6px_6px_0px_rgba(245,158,11,0.2)] flex flex-col gap-2.5"
+            >
               <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
                 <div className="flex items-center gap-2">
                   <span className="text-sm">🔥</span>
@@ -442,9 +515,11 @@ ${auditData.timelineFeedback
                       : "Unfiltered Bro Opinion"}
                   </h4>
                 </div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBroOpinion(!showBroOpinion)}
-                  className="flex items-center gap-1.5 bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-xl text-[10px] font-bold font-mono transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-xl text-[10px] font-bold font-mono cursor-pointer"
                 >
                   {showBroOpinion ? <EyeClosedIcon /> : <EyeOpenIcon />}
                   <span>
@@ -456,48 +531,72 @@ ${auditData.timelineFeedback
                         ? "Revelar"
                         : "Reveal"}
                   </span>
-                </button>
+                </motion.button>
               </div>
-              {showBroOpinion ? (
-                <p className="text-xs font-medium text-amber-100 bg-amber-950/30 p-3.5 rounded-2xl border border-amber-500/30 leading-relaxed italic font-sans">
-                  "{auditData.broRoast || auditData.summary}"
-                </p>
-              ) : (
-                <p className="text-[11px] text-zinc-500 italic px-1 font-mono">
-                  {lang === "es"
-                    ? "⚠️ Crítica sin censura. Haz clic en Revelar para ver qué opina Cutty."
-                    : "⚠️ Honest critique. Click Reveal to see what Cutty thinks."}
-                </p>
-              )}
-            </div>
+
+              <AnimatePresence>
+                {showBroOpinion ? (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="text-xs font-medium text-amber-100 bg-amber-950/30 p-3.5 rounded-2xl border border-amber-500/30 leading-relaxed italic font-sans overflow-hidden"
+                  >
+                    "{auditData.broRoast || auditData.summary}"
+                  </motion.p>
+                ) : (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-[11px] text-zinc-500 italic px-1 font-mono"
+                  >
+                    {lang === "es"
+                      ? "⚠️ Crítica sin censura. Haz clic en Revelar para ver qué opina Cutty."
+                      : "⚠️ Honest critique. Click Reveal to see what Cutty thinks."}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
           )}
         </div>
 
-        {/* COLUMN 3 (4 COLS): DIRECTOR'S VERDICT & KEY MOMENTS */}
+        {/* COLUMN 3 (4 COLS): VERDICT & KEY MOMENTS */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          {auditData && (
-            <div className="bg-zinc-950 border-2 border-emerald-500/40 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
-              <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-zinc-800">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">🎬</span>
-                  <h4 className="text-xs font-black text-emerald-400 uppercase tracking-wider font-mono">
-                    {lang === "es"
-                      ? "Veredicto del Director"
-                      : "Director's Verdict"}
-                  </h4>
+          <AnimatePresence>
+            {auditData && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-zinc-950 border-2 border-emerald-500/40 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)]"
+              >
+                <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🎬</span>
+                    <h4 className="text-xs font-black text-emerald-400 uppercase tracking-wider font-mono">
+                      {lang === "es"
+                        ? "Veredicto del Director"
+                        : "Director's Verdict"}
+                    </h4>
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700">
+                    PRO SCAN
+                  </span>
                 </div>
-                <span className="text-[9px] font-mono font-bold text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700">
-                  PRO SCAN
-                </span>
-              </div>
-              <p className="text-xs text-zinc-300 leading-relaxed max-h-36 overflow-y-auto pr-1">
-                {auditData.summary}
-              </p>
-            </div>
-          )}
+                <p className="text-xs text-zinc-300 leading-relaxed max-h-36 overflow-y-auto pr-1">
+                  {auditData.summary}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Key Moments */}
-          <div className="bg-zinc-950 border-2 border-indigo-500/30 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col">
+          <motion.div
+            layout
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-zinc-950 border-2 border-indigo-500/30 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col"
+          >
             <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-zinc-800">
               <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider font-mono">
                 {lang === "es"
@@ -512,12 +611,17 @@ ${auditData.timelineFeedback
             <div className="flex flex-col gap-2.5 overflow-y-auto max-h-[280px] pr-1">
               {auditData ? (
                 auditData.timelineFeedback?.map((item, idx) => (
-                  <button
+                  <motion.button
                     key={idx}
+                    initial={{ opacity: 0, x: -15 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.08 }}
+                    whileHover={{ scale: 1.02, x: 2 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => seekTo(item.timestampSeconds)}
-                    className={`text-left p-3 rounded-2xl text-xs transition-all border-2 flex items-center justify-between cursor-pointer ${
+                    className={`text-left p-3 rounded-2xl text-xs transition-colors border-2 flex items-center justify-between cursor-pointer ${
                       currentSecond === item.timestampSeconds
-                        ? "bg-indigo-950 border-indigo-400 text-indigo-100 shadow-[3px_3px_0px_#000] scale-[1.01]"
+                        ? "bg-indigo-950 border-indigo-400 text-indigo-100 shadow-[3px_3px_0px_#000]"
                         : "bg-zinc-900/60 border-zinc-800/90 hover:border-zinc-700 text-zinc-300 shadow-sm"
                     }`}
                   >
@@ -535,7 +639,7 @@ ${auditData.timelineFeedback
                       </div>
                     </div>
                     <PlayIcon />
-                  </button>
+                  </motion.button>
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center h-44 text-zinc-500 text-xs italic text-center p-4 font-mono">
@@ -545,14 +649,22 @@ ${auditData.timelineFeedback
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* 3. BOTTOM ASSET KIT */}
-      {auditData?.editingKit && (
-        <EditingKitCard kit={auditData.editingKit} lang={lang} />
-      )}
-    </div>
+      {/* 3. BOTTOM ASSET KIT ANIMADO */}
+      <AnimatePresence>
+        {auditData?.editingKit && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          >
+            <EditingKitCard kit={auditData.editingKit} lang={lang} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

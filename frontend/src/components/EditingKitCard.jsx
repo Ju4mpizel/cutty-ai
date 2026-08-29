@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function EditingKitCard({ kit, lang = "es" }) {
+export default function EditingKitCard({ kit, lang = "en" }) {
   const [copiedText, setCopiedText] = useState(null);
 
   if (!kit) return null;
@@ -11,8 +12,26 @@ export default function EditingKitCard({ kit, lang = "es" }) {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
+  const colVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        type: "spring",
+        stiffness: 240,
+        damping: 20,
+      },
+    }),
+  };
+
   return (
-    <div className="bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-5 sm:p-6 flex flex-col gap-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] w-full">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-5 sm:p-6 flex flex-col gap-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] w-full"
+    >
       {/* HEADER DEL KIT */}
       <div className="flex items-center justify-between border-b-2 border-zinc-800/80 pb-3.5">
         <div className="flex items-center gap-2.5">
@@ -37,10 +56,16 @@ export default function EditingKitCard({ kit, lang = "es" }) {
         </span>
       </div>
 
-      {/* 4 COLUMNAS BENTO NEO-BRUTALISTAS */}
+      {/* 4 COLUMNAS BENTO */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
         {/* 1. SFX */}
-        <div className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
+        <motion.div
+          custom={0}
+          variants={colVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]"
+        >
           <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider font-mono">
               <span>🔊</span> {lang === "es" ? "Efectos Sonido" : "SFX"}
@@ -51,10 +76,12 @@ export default function EditingKitCard({ kit, lang = "es" }) {
           </div>
           <div className="flex flex-col gap-2 flex-1">
             {kit.sfx?.slice(0, 3).map((item, idx) => (
-              <button
+              <motion.button
                 key={idx}
+                whileHover={{ scale: 1.02, x: 2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleCopy(item.name)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-emerald-500/50 transition-all text-left cursor-pointer group shadow-sm active:translate-x-0.5 active:translate-y-0.5"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-emerald-500/50 transition-colors text-left cursor-pointer group shadow-sm"
                 title={lang === "es" ? "Clic para copiar" : "Click to copy"}
               >
                 <div className="overflow-hidden pr-1">
@@ -68,19 +95,25 @@ export default function EditingKitCard({ kit, lang = "es" }) {
                 <span
                   className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ml-1.5 font-bold transition-colors ${
                     copiedText === item.name
-                      ? "bg-emerald-500 text-black"
+                      ? "bg-emerald-500 text-black font-black"
                       : "bg-zinc-900 text-zinc-400 group-hover:text-zinc-200 border border-zinc-800"
                   }`}
                 >
-                  {copiedText === item.name ? "✓" : "Copiar"}
+                  {copiedText === item.name ? "✓" : "Copy"}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* 2. TIPOGRAFÍAS */}
-        <div className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
+        {/* 2. FONTS */}
+        <motion.div
+          custom={1}
+          variants={colVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]"
+        >
           <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-black text-cyan-400 uppercase tracking-wider font-mono">
               <span>✍️</span> {lang === "es" ? "Tipografías" : "Fonts"}
@@ -91,14 +124,16 @@ export default function EditingKitCard({ kit, lang = "es" }) {
           </div>
           <div className="flex flex-col gap-2 flex-1">
             {kit.fonts?.slice(0, 3).map((item, idx) => (
-              <button
+              <motion.button
                 key={idx}
+                whileHover={{ scale: 1.02, x: 2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleCopy(item.name)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-cyan-500/50 transition-all text-left cursor-pointer group shadow-sm active:translate-x-0.5 active:translate-y-0.5"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-cyan-500/50 transition-colors text-left cursor-pointer group shadow-sm"
                 title={lang === "es" ? "Clic para copiar" : "Click to copy"}
               >
                 <div className="overflow-hidden pr-1">
-                  <p className="text-xs font-bold text-zinc-200 group-hover:text-cyan-400 truncate font-sans">
+                  <p className="text-xs font-bold text-zinc-200 group-hover:text-cyan-400 truncate">
                     {item.name}
                   </p>
                   <p className="text-[10px] text-zinc-400 font-mono leading-tight mt-0.5 truncate">
@@ -108,19 +143,25 @@ export default function EditingKitCard({ kit, lang = "es" }) {
                 <span
                   className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ml-1.5 font-bold transition-colors ${
                     copiedText === item.name
-                      ? "bg-cyan-400 text-black"
+                      ? "bg-cyan-400 text-black font-black"
                       : "bg-zinc-900 text-zinc-400 group-hover:text-zinc-200 border border-zinc-800"
                   }`}
                 >
-                  {copiedText === item.name ? "✓" : "Copiar"}
+                  {copiedText === item.name ? "✓" : "Copy"}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* 3. EFECTOS VISUALES */}
-        <div className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
+        {/* 3. VFX */}
+        <motion.div
+          custom={2}
+          variants={colVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]"
+        >
           <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-black text-amber-400 uppercase tracking-wider font-mono">
               <span>✨</span> {lang === "es" ? "Efectos Visuales" : "Effects"}
@@ -131,10 +172,12 @@ export default function EditingKitCard({ kit, lang = "es" }) {
           </div>
           <div className="flex flex-col gap-2 flex-1">
             {kit.effects?.slice(0, 3).map((item, idx) => (
-              <button
+              <motion.button
                 key={idx}
+                whileHover={{ scale: 1.02, x: 2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleCopy(item.name)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-amber-500/50 transition-all text-left cursor-pointer group shadow-sm active:translate-x-0.5 active:translate-y-0.5"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-amber-500/50 transition-colors text-left cursor-pointer group shadow-sm"
                 title={lang === "es" ? "Clic para copiar" : "Click to copy"}
               >
                 <div className="overflow-hidden pr-1">
@@ -148,19 +191,25 @@ export default function EditingKitCard({ kit, lang = "es" }) {
                 <span
                   className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ml-1.5 font-bold transition-colors ${
                     copiedText === item.name
-                      ? "bg-amber-400 text-black"
+                      ? "bg-amber-400 text-black font-black"
                       : "bg-zinc-900 text-zinc-400 group-hover:text-zinc-200 border border-zinc-800"
                   }`}
                 >
-                  {copiedText === item.name ? "✓" : "Copiar"}
+                  {copiedText === item.name ? "✓" : "Copy"}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* 4. COLORES SUBTÍTULOS */}
-        <div className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]">
+        {/* 4. COLORS */}
+        <motion.div
+          custom={3}
+          variants={colVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-zinc-900/60 border-2 border-zinc-800/90 rounded-2xl p-3.5 flex flex-col gap-3 shadow-[3px_3px_0px_rgba(0,0,0,0.8)]"
+        >
           <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-black text-rose-400 uppercase tracking-wider font-mono">
               <span>🎨</span> {lang === "es" ? "Colores Subtítulos" : "Colors"}
@@ -171,10 +220,12 @@ export default function EditingKitCard({ kit, lang = "es" }) {
           </div>
           <div className="flex flex-col gap-2 flex-1">
             {kit.colorPalette?.slice(0, 3).map((item, idx) => (
-              <button
+              <motion.button
                 key={idx}
+                whileHover={{ scale: 1.02, x: 2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleCopy(item.hex)}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-rose-500/50 transition-all text-left cursor-pointer group shadow-sm active:translate-x-0.5 active:translate-y-0.5"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-800/80 border border-zinc-800 hover:border-rose-500/50 transition-colors text-left cursor-pointer group shadow-sm"
                 title={
                   lang === "es" ? "Clic para copiar Hex" : "Click to copy Hex"
                 }
@@ -196,17 +247,17 @@ export default function EditingKitCard({ kit, lang = "es" }) {
                 <span
                   className={`text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ml-1.5 font-bold transition-colors ${
                     copiedText === item.hex
-                      ? "bg-rose-500 text-black"
+                      ? "bg-rose-500 text-black font-black"
                       : "bg-zinc-900 text-zinc-400 group-hover:text-zinc-200 border border-zinc-800"
                   }`}
                 >
-                  {copiedText === item.hex ? "✓" : "Copiar"}
+                  {copiedText === item.hex ? "✓" : "Copy"}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
