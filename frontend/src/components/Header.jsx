@@ -48,33 +48,36 @@ export default function Header({
             <span>Vertex AI Global</span>
           </div>
 
-          {/* SELECTOR DE IDIOMA: Solo visible en la Landing */}
+          {/* SELECTOR DE IDIOMA CON BANDERITAS */}
           {!isAuditingView ? (
-            <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-xl p-0.5 shadow-[2px_2px_0px_rgba(39,39,42,1)]">
-              <button
-                onClick={() => setLang("es")}
-                className={`px-3 py-1 text-xs font-bold font-mono rounded-lg transition-all cursor-pointer ${
-                  lang === "es"
-                    ? "bg-emerald-500 text-black shadow-sm font-black"
-                    : "text-zinc-400 hover:text-white"
-                }`}
-              >
-                ES
-              </button>
+            <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-xl p-1 shadow-[2px_2px_0px_rgba(39,39,42,1)] gap-1">
               <button
                 onClick={() => setLang("en")}
-                className={`px-3 py-1 text-xs font-bold font-mono rounded-lg transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold font-mono rounded-lg transition-all cursor-pointer ${
                   lang === "en"
                     ? "bg-emerald-500 text-black shadow-sm font-black"
                     : "text-zinc-400 hover:text-white"
                 }`}
               >
-                EN
+                <span>🇺🇸</span>
+                <span>EN</span>
+              </button>
+              <button
+                onClick={() => setLang("es")}
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold font-mono rounded-lg transition-all cursor-pointer ${
+                  lang === "es"
+                    ? "bg-emerald-500 text-black shadow-sm font-black"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                <span>🇪🇸</span>
+                <span>ES</span>
               </button>
             </div>
           ) : (
-            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 uppercase">
-              {lang === "es" ? "Auditando (ES)" : "Auditing (EN)"}
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 uppercase flex items-center gap-1.5">
+              <span>{lang === "es" ? "🇪🇸" : "🇺🇸"}</span>
+              <span>{lang === "es" ? "ES" : "EN"}</span>
             </span>
           )}
         </div>

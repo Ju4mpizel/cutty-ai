@@ -10,24 +10,37 @@ const MOOD_IMAGES = {
 };
 
 const MOOD_LABELS = {
-  happy: "🔥 ¡Ritmo impecable!",
-  bored: "😴 Se vuelve lento aquí",
-  analyzing: "🧐 Analizando técnica...",
-  confused: "❓ Audio/Corte confuso",
-  shocked: "⚠️ Error crítico de retención",
-  encouraging: "💡 ¡Buena idea, ajústala!",
+  es: {
+    happy: "🔥 ¡Ritmo impecable!",
+    bored: "😴 Se vuelve lento aquí",
+    analyzing: "🧐 Analizando técnica...",
+    confused: "❓ Audio/Corte confuso",
+    shocked: "⚠️ Error crítico de retención",
+    encouraging: "💡 ¡Buena idea, ajústala!",
+  },
+  en: {
+    happy: "🔥 Flawless Pacing!",
+    bored: "😴 Retention Drop Here",
+    analyzing: "🧐 Analyzing Technique...",
+    confused: "❓ Confusing Audio/Cut",
+    shocked: "⚠️ Critical Hook Flaw",
+    encouraging: "💡 Great Concept, Polish It!",
+  },
 };
 
 export default function MascotCard({
   mood = "analyzing",
   score = null,
   currentTip = null,
+  lang = "en",
 }) {
   const imageSrc = MOOD_IMAGES[mood] || MOOD_IMAGES.analyzing;
+  const labels = MOOD_LABELS[lang] || MOOD_LABELS.en;
+  const moodText = labels[mood] || mood;
 
   return (
     <div className="bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-5 flex flex-col items-center text-center shadow-[4px_4px_0px_rgba(0,0,0,1)] w-full">
-      {/* CONTENEDOR DE LA MASCOTA */}
+      {/* MASCOT VISUAL CONTAINER */}
       <div className="relative mb-3.5 flex items-center justify-center">
         <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-inner">
           <img
@@ -38,7 +51,7 @@ export default function MascotCard({
           />
         </div>
 
-        {/* BADGE VIRALITY SCORE NEO-BRUTAL */}
+        {/* VIRALITY SCORE BADGE */}
         {score !== null && (
           <div className="absolute -bottom-2.5 bg-emerald-500 text-black font-black font-mono text-xs px-3 py-1 rounded-xl border-2 border-black shadow-[2px_2px_0px_#000] tracking-wider uppercase">
             Score: {score}/100
@@ -46,12 +59,12 @@ export default function MascotCard({
         )}
       </div>
 
-      {/* ESTADO / MOOD */}
+      {/* DYNAMIC MOOD BADGE */}
       <span className="text-xs font-black font-mono text-emerald-400 mt-1 mb-3 uppercase tracking-wider bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">
-        {MOOD_LABELS[mood] || mood}
+        {moodText}
       </span>
 
-      {/* TARJETA DE TIP EN TIEMPO REAL */}
+      {/* REAL-TIME TIMELINE TIP */}
       {currentTip ? (
         <div className="bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-3.5 text-left w-full shadow-inner">
           <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-zinc-800">
@@ -73,7 +86,9 @@ export default function MascotCard({
         </div>
       ) : (
         <p className="text-xs text-zinc-500 mt-1 font-mono italic">
-          Reproduce el video para sincronizar las reacciones de Cutty en vivo.
+          {lang === "es"
+            ? "Reproduce el video para sincronizar las reacciones de Cutty en vivo."
+            : "Play the video to sync Cutty's live reactions in real-time."}
         </p>
       )}
     </div>

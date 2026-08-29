@@ -83,64 +83,74 @@ const LIVE_SCAN_FEEDBACK = {
     {
       sec: 0,
       mood: "analyzing",
-      critique: "Escaneando primeros 3s. Detectando Hook visual...",
-      suggestion: "Midiendo impacto inicial",
+      type: "HOOK",
+      critique: "Escaneando primeros 3s. Evaluando gancho visual...",
+      suggestion: "Midiendo impacto inicial y retención",
     },
     {
       sec: 3,
       mood: "bored",
-      critique: "Comprobando ritmo de cortes y dinamismo...",
-      suggestion: "Detectando caídas de atención",
+      type: "PACING",
+      critique: "Comprobando ritmo de cortes y dinamismo visual...",
+      suggestion: "Detectando posibles caídas de atención",
     },
     {
       sec: 6,
       mood: "confused",
+      type: "AUDIO",
       critique: "Analizando balance vocal y diseño sonoro...",
-      suggestion: "Verificando claridad de audio",
+      suggestion: "Verificando claridad de frecuencias y música",
     },
     {
       sec: 9,
       mood: "shocked",
-      critique: "Detectando elementos visuales estáticos...",
-      suggestion: "Calculando retención final",
+      type: "TRANSITION",
+      critique: "Inspeccionando transiciones y elementos estáticos...",
+      suggestion: "Calculando curva de retención final",
     },
     {
       sec: 11,
       mood: "encouraging",
-      critique: "Sintetizando veredicto con Gemini 3.5...",
-      suggestion: "Generando Kit de Assets",
+      type: "SYNTHESIS",
+      critique: "Sintetizando veredicto con Gemini 3.5 Flash...",
+      suggestion: "Generando kit de assets curado",
     },
   ],
   en: [
     {
       sec: 0,
       mood: "analyzing",
-      critique: "Scanning first 3s. Searching for visual hook...",
-      suggestion: "Checking initial retention",
+      type: "HOOK",
+      critique: "Scanning first 3s. Inspecting visual hook strength...",
+      suggestion: "Measuring initial impact & retention",
     },
     {
       sec: 3,
       mood: "bored",
-      critique: "Measuring pace and visual dynamics...",
-      suggestion: "Spotting potential drop-offs",
+      type: "PACING",
+      critique: "Measuring cut pace and motion dynamics...",
+      suggestion: "Spotting potential viewer drop-offs",
     },
     {
       sec: 6,
       mood: "confused",
-      critique: "Analyzing audio frequencies and sound balance...",
-      suggestion: "Verifying audio punch",
+      type: "AUDIO",
+      critique: "Analyzing voiceover clarity & sound balance...",
+      suggestion: "Verifying audio punch & mixing",
     },
     {
       sec: 9,
       mood: "shocked",
-      critique: "Detecting static elements...",
-      suggestion: "Calculating retention curve",
+      type: "TRANSITION",
+      critique: "Inspecting static frames & visual transitions...",
+      suggestion: "Calculating final retention curve",
     },
     {
       sec: 11,
       mood: "encouraging",
-      critique: "Synthesizing verdict with Gemini 3.5...",
-      suggestion: "Curating Asset Kit",
+      type: "SYNTHESIS",
+      critique: "Synthesizing verdict with Gemini 3.5 Flash...",
+      suggestion: "Curating specialized asset kit",
     },
   ],
 };
@@ -148,7 +158,7 @@ const LIVE_SCAN_FEEDBACK = {
 export default function VideoAuditWorkspace({
   videoFile,
   videoUrl,
-  lang = "es",
+  lang = "en",
   onReset,
 }) {
   const [isAuditing, setIsAuditing] = useState(false);
@@ -259,7 +269,7 @@ ${auditData.timelineFeedback
   let activeFeedback = null;
   let currentMood = "analyzing";
 
-  const liveList = LIVE_SCAN_FEEDBACK[lang] || LIVE_SCAN_FEEDBACK.es;
+  const liveList = LIVE_SCAN_FEEDBACK[lang] || LIVE_SCAN_FEEDBACK.en;
 
   if (isAuditing) {
     activeFeedback =
@@ -283,7 +293,7 @@ ${auditData.timelineFeedback
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto px-2 sm:px-4 py-4">
-      {/* 1. BARRA SUPERIOR DE CONTROL */}
+      {/* 1. TOP CONTROL BAR */}
       <div className="flex flex-wrap items-center justify-between bg-zinc-950 border-2 border-zinc-800 p-3 sm:p-4 rounded-3xl shadow-[4px_4px_0px_rgba(0,0,0,1)] gap-3">
         <button
           onClick={onReset}
@@ -304,7 +314,7 @@ ${auditData.timelineFeedback
               {copiedReport
                 ? lang === "es"
                   ? "✓ Reporte Copiado"
-                  : "✓ Copied"
+                  : "✓ Report Copied"
                 : lang === "es"
                   ? "📋 Copiar Reporte"
                   : "📋 Copy Full Report"}
@@ -313,9 +323,9 @@ ${auditData.timelineFeedback
         </div>
       </div>
 
-      {/* 2. FILA SUPERIOR: CONSOLA BENTO 3 COLUMNAS */}
+      {/* 2. TOP BENTO GRID: 3 COLUMNS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* COLUMNA 1 (4 COLS): VIDEO REPRODUCCIÓN + TIMELINE RETENCIÓN */}
+        {/* COLUMN 1 (4 COLS): 9:16 VIDEO PLAYER */}
         <div className="lg:col-span-4 bg-zinc-950 border-2 border-zinc-800 rounded-3xl p-4 sm:p-5 flex flex-col items-center gap-4 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
           <div className="w-full max-w-[280px] bg-black rounded-2xl overflow-hidden border-2 border-zinc-800 shadow-2xl relative aspect-[9/16] flex items-center justify-center">
             <video
@@ -335,7 +345,7 @@ ${auditData.timelineFeedback
             )}
           </div>
 
-          {/* Barra de retención */}
+          {/* Retention Progress Bar */}
           <div className="w-full max-w-[280px] bg-zinc-900 border-2 border-zinc-800 rounded-2xl p-3 flex flex-col gap-2 shadow-inner">
             <div className="flex justify-between items-center text-[11px] font-mono text-zinc-400">
               <span className="text-emerald-400 font-black">
@@ -378,7 +388,7 @@ ${auditData.timelineFeedback
           </div>
         </div>
 
-        {/* COLUMNA 2 (4 COLS): MASCOTA INTERACTIVA + MODO BRO */}
+        {/* COLUMN 2 (4 COLS): INTERACTIVE MASCOT CARD */}
         <div className="lg:col-span-4 flex flex-col gap-4">
           {!auditData && !isAuditing && (
             <div className="bg-zinc-950 border-2 border-emerald-500/40 p-8 rounded-3xl text-center flex flex-col items-center shadow-[6px_6px_0px_rgba(16,185,129,0.3)] justify-center">
@@ -416,6 +426,7 @@ ${auditData.timelineFeedback
                 mood={currentMood}
                 score={auditData?.viralityScore || null}
                 currentTip={activeFeedback}
+                lang={lang}
               />
             </div>
           )}
@@ -462,7 +473,7 @@ ${auditData.timelineFeedback
           )}
         </div>
 
-        {/* COLUMNA 3 (4 COLS): VEREDICTO DEL DIRECTOR + MOMENTOS CLAVE */}
+        {/* COLUMN 3 (4 COLS): DIRECTOR'S VERDICT & KEY MOMENTS */}
         <div className="lg:col-span-4 flex flex-col gap-4">
           {auditData && (
             <div className="bg-zinc-950 border-2 border-emerald-500/40 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)]">
@@ -485,7 +496,7 @@ ${auditData.timelineFeedback
             </div>
           )}
 
-          {/* Momentos Clave / Timeline */}
+          {/* Key Moments */}
           <div className="bg-zinc-950 border-2 border-indigo-500/30 rounded-3xl p-4 sm:p-5 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col">
             <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-zinc-800">
               <h4 className="text-xs font-black text-indigo-300 uppercase tracking-wider font-mono">
@@ -538,7 +549,7 @@ ${auditData.timelineFeedback
         </div>
       </div>
 
-      {/* 3. FILA INFERIOR: KIT DE ASSETS NEO-BRUTALISTA */}
+      {/* 3. BOTTOM ASSET KIT */}
       {auditData?.editingKit && (
         <EditingKitCard kit={auditData.editingKit} lang={lang} />
       )}
