@@ -1,178 +1,246 @@
-import React, { useState } from "react";
-
-const UploadIcon = () => (
-  <svg
-    className="w-12 h-12 text-emerald-400 mb-3 group-hover:scale-110 transition-transform"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-    />
-  </svg>
-);
+import React, { useRef, useState } from "react";
 
 export default function HeroLanding({ lang, onFileSelect }) {
-  const [isHovered, setIsHovered] = useState(false);
+  const fileInputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const t = {
-    es: {
-      badge: "🚀 Para creadores de TikTok, Reels y Shorts",
-      title1: "Tu mejor y peor amigo",
-      title2: "para editar video.",
-      subtitle:
-        "Cutty analiza tu borrador segundo a segundo con Gemini 3.6. Detecta cuándo la gente se aburre, juzga tu ritmo y te entrega el kit exacto de sonidos y fuentes para viralizarlo.",
-      dropTitle: "Arrastra tu borrador (.mp4) aquí",
-      dropSubtitle: "o haz clic para explorar tus archivos",
-      dropSpecs: "Soporta formatos 9:16 y 16:9 • Hasta 60s recomendado",
-      featuresTitle: "¿Por qué los editores usan a Cutty?",
-      f1_title: "Escaneo Cuadro a Cuadro",
-      f1_desc:
-        "Inspección de ganchos (0-3s), cambios de plano y pausas muertas.",
-      f2_title: "Kit de Assets Reales",
-      f2_desc:
-        "Nombres exactos de SFX, fuentes virales y efectos listos para CapCut.",
-      f3_title: "Opinión Sin Filtro (Modo Bro)",
-      f3_desc:
-        "La crítica honesta y sin anestesia que tus amigos no se atreven a darte.",
-      f4_title: "Feedback Sincronizado",
-      f4_desc:
-        "Cutty cambia de expresiones en vivo mientras corre tu línea de tiempo.",
-    },
-    en: {
-      badge: "🚀 Built for TikTok, Reels and Shorts creators",
-      title1: "Your best and worst friend",
-      title2: "for video editing.",
-      subtitle:
-        "Cutty audits your draft second by second with Gemini 3.6. Catches where viewers drop off, judges your pacing, and hands you the exact sound & font pack to go viral.",
-      dropTitle: "Drop your draft video (.mp4) here",
-      dropSubtitle: "or click to browse local files",
-      dropSpecs: "Supports 9:16 and 16:9 • Up to 60s recommended",
-      featuresTitle: "Why creators rely on Cutty",
-      f1_title: "Frame-by-Frame Audit",
-      f1_desc:
-        "Deep inspection of retention hooks (0-3s), transitions and dead air.",
-      f2_title: "Real Editing Asset Kit",
-      f2_desc:
-        "Searchable CapCut sound names, viral fonts, and trending effects.",
-      f3_title: "Unfiltered Bro Roast",
-      f3_desc:
-        "Brutally honest feedback your friends are too polite to tell you.",
-      f4_title: "Synchronized Reactions",
-      f4_desc:
-        "Cutty dynamically changes emotions in real-time as your video plays.",
-    },
-  }[lang];
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      onFileSelect({ target: { files: e.dataTransfer.files } });
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-16 py-8">
-      {/* Hero Section */}
-      <div className="flex flex-col items-center text-center max-w-4xl mx-auto px-4">
-        {/* Pill Badge */}
-        <div className="inline-flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 shadow-lg shadow-emerald-950/30">
-          {t.badge}
-        </div>
-
-        {/* Mascota con Diálogo Flotante */}
-        <div className="relative mb-6 flex flex-col items-center">
-          <div className="bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs px-4 py-2 rounded-2xl shadow-2xl mb-2 flex items-center gap-2 animate-bounce">
-            <span>🤖</span>
-            <span className="font-mono">
+    <div className="flex flex-col gap-12 py-6 sm:py-10 max-w-7xl mx-auto w-full">
+      {/* SECCIÓN HERO PRINCIPAL: IZQUIERDA TEXTO / DERECHA CUTTY */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* COLUMNA IZQUIERDA: COPY + DROPZONE TÉCNICA */}
+        <div className="lg:col-span-7 flex flex-col gap-6 text-left">
+          {/* BADGE SUPERIOR */}
+          <div className="inline-flex items-center gap-2 self-start bg-zinc-900/90 border border-emerald-500/30 px-3.5 py-1.5 rounded-full shadow-[2px_2px_0px_rgba(16,185,129,0.3)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-xs font-mono font-bold text-emerald-300 uppercase tracking-wide">
               {lang === "es"
-                ? "«Pásame tu borrador, prometo no juzgarte tanto... (mentira)»"
-                : "«Drop your draft, I promise not to judge hard... (lying)»"}
+                ? "Auditor Multimodal de Retención 9:16"
+                : "Multimodal 9:16 Retention Auditor"}
             </span>
           </div>
 
+          {/* TÍTULO HERO */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase leading-[1.05]">
+            {lang === "es" ? (
+              <>
+                Convierte tus clips en{" "}
+                <span className="text-emerald-400 underline decoration-emerald-500/50 underline-offset-8">
+                  máquinas de retención
+                </span>
+              </>
+            ) : (
+              <>
+                Turn your raw clips into{" "}
+                <span className="text-emerald-400 underline decoration-emerald-500/50 underline-offset-8">
+                  retention beasts
+                </span>
+              </>
+            )}
+          </h1>
+
+          {/* DESCRIPCIÓN */}
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-xl font-normal">
+            {lang === "es"
+              ? "Cutty analiza segundo a segundo tus videos cortos (TikTok, Reels, Shorts) detectando caídas de atención, debilidades en el hook y entregándote el kit exacto de assets para editar en CapCut o Premiere."
+              : "Cutty inspects your short-form videos second-by-second, pinpointing retention drop-offs, hook flaws, and curating the exact asset kit for CapCut or Premiere."}
+          </p>
+
+          {/* DROPZONE NEO-BRUTALISTA */}
           <div
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="relative cursor-pointer transition-transform hover:scale-110"
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`group relative overflow-hidden rounded-3xl border-2 border-dashed p-7 transition-all cursor-pointer bg-zinc-950 flex flex-col items-center justify-center text-center gap-4 ${
+              isDragging
+                ? "border-emerald-400 bg-emerald-950/20 scale-[1.01]"
+                : "border-zinc-700 hover:border-emerald-400/80 hover:bg-zinc-900/70 shadow-[4px_4px_0px_rgba(39,39,42,1)] hover:shadow-[5px_5px_0px_rgba(16,185,129,0.8)] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+            }`}
           >
-            <img
-              src={isHovered ? "/mascot/shocked.png" : "/mascot/analyzing.png"}
-              alt="Cutty Robot"
-              className="w-32 h-32 object-contain"
-              style={{ imageRendering: "pixelated" }}
-            />
-          </div>
-        </div>
-
-        {/* Título Principal */}
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-100 leading-tight">
-          {t.title1} <br />
-          <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-            {t.title2}
-          </span>
-        </h1>
-
-        <p className="text-zinc-400 text-sm sm:text-base max-w-2xl mt-4 leading-relaxed">
-          {t.subtitle}
-        </p>
-
-        {/* Dropzone Moderno */}
-        <div className="w-full max-w-xl mt-10">
-          <div className="group relative border-2 border-dashed border-zinc-700 hover:border-emerald-500 bg-zinc-900/40 hover:bg-zinc-900/80 rounded-3xl p-10 flex flex-col items-center justify-center transition-all cursor-pointer shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <input
               type="file"
-              accept="video/*"
+              ref={fileInputRef}
               onChange={onFileSelect}
-              className="absolute inset-0 opacity-0 cursor-pointer"
+              accept="video/mp4,video/quicktime,video/webm"
+              className="hidden"
             />
-            <UploadIcon />
-            <p className="font-bold text-base text-zinc-100 mt-2">
-              {t.dropTitle}
-            </p>
-            <p className="text-xs text-zinc-400 mt-1">{t.dropSubtitle}</p>
-            <span className="text-[11px] text-emerald-400/80 font-mono mt-4 bg-emerald-950/40 border border-emerald-500/20 px-3 py-1 rounded-full">
-              {t.dropSpecs}
-            </span>
+
+            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border-2 border-zinc-700 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:border-emerald-400 transition-all shadow-inner">
+              ⚡
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-black uppercase tracking-wider text-zinc-100 group-hover:text-emerald-400 transition-colors">
+                {lang === "es"
+                  ? "Suelta tu video aquí o haz clic para subir"
+                  : "Drop your video here or click to browse"}
+              </p>
+              <p className="text-xs font-mono text-zinc-500">
+                MP4, MOV, WEBM • Max 30MB • 1080p / 720p
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="mt-1 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase font-mono tracking-wider px-6 py-3 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer"
+            >
+              {lang === "es" ? "Seleccionar Video" : "Select Video File"}
+            </button>
+          </div>
+
+          {/* BADGES DE SPECS RÁPIDAS */}
+          <div className="grid grid-cols-3 gap-3 pt-1">
+            <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase block">
+                Análisis
+              </span>
+              <span className="text-xs font-bold text-zinc-200">
+                Multimodal 9:16
+              </span>
+            </div>
+            <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase block">
+                Modelo
+              </span>
+              <span className="text-xs font-bold text-emerald-400 font-mono">
+                Gemini 3.5 Global
+              </span>
+            </div>
+            <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase block">
+                Kit Export
+              </span>
+              <span className="text-xs font-bold text-amber-300">
+                SFX, Fonts & FX
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* COLUMNA DERECHA: SHOWCASE DE CUTTY / NEO-BRUTAL MASCOT CARD */}
+        <div className="lg:col-span-5 flex flex-col items-center justify-center">
+          <div className="w-full max-w-md bg-zinc-900/70 border-2 border-zinc-800 rounded-3xl p-6 shadow-[8px_8px_0px_rgba(16,185,129,0.25)] relative overflow-hidden backdrop-blur-sm">
+            {/* Header de la tarjeta */}
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-rose-500 border border-rose-600 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-amber-500 border border-amber-600 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-600 inline-block" />
+                <span className="text-[11px] font-mono text-zinc-400 font-bold ml-1">
+                  CUTTY_COPILOT.EXE
+                </span>
+              </div>
+              <span className="text-[10px] font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700">
+                DIRECTOR MODE
+              </span>
+            </div>
+
+            {/* Visual de Cutty */}
+            <div className="flex flex-col items-center text-center my-3">
+              <div className="relative p-6 rounded-2xl bg-zinc-950 border border-zinc-800/80 shadow-inner w-full flex items-center justify-center">
+                <img
+                  src="/mascot/analyzing.png"
+                  alt="Cutty Analyzing"
+                  className="w-40 h-40 object-contain animate-pulse"
+                  style={{ imageRendering: "pixelated" }}
+                />
+                <div className="absolute top-3 right-3 bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 font-mono text-[10px] font-bold px-2 py-1 rounded-lg">
+                  AI SCAN READY
+                </div>
+              </div>
+
+              {/* Globo de diálogo de Cutty */}
+              <div className="mt-4 p-4 rounded-2xl bg-zinc-950 border border-emerald-500/30 text-left w-full shadow-md">
+                <p className="text-[11px] font-mono text-emerald-400 font-bold uppercase mb-1">
+                  💬 Cutty Director:
+                </p>
+                <p className="text-xs text-zinc-300 leading-relaxed italic">
+                  {lang === "es"
+                    ? '"Sube tu borrador. Mediré el gancho en los primeros 3 segundos y te diré exactamente qué cortar antes de que el algoritmo te entierre."'
+                    : '"Upload your cut. I’ll audit your 3-second hook and tell you what to trim before the algorithm buries your video."'}
+                </p>
+              </div>
+            </div>
+
+            {/* Métricas simuladas */}
+            <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-zinc-800 text-center font-mono">
+              <div className="bg-zinc-950/60 p-2.5 rounded-xl border border-zinc-800">
+                <span className="text-[10px] text-zinc-500 block">
+                  TIEMPO PROMEDIO
+                </span>
+                <span className="text-xs font-bold text-zinc-200">
+                  ~6 Segundos
+                </span>
+              </div>
+              <div className="bg-zinc-950/60 p-2.5 rounded-xl border border-zinc-800">
+                <span className="text-[10px] text-zinc-500 block">
+                  PRECISIÓN DE AUDITORÍA
+                </span>
+                <span className="text-xs font-bold text-emerald-400">
+                  99.4% Virality
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Grid de Features */}
-      <div className="max-w-5xl mx-auto px-4 w-full">
-        <h3 className="text-center text-xs font-bold uppercase tracking-widest text-zinc-500 mb-8">
-          {t.featuresTitle}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-zinc-900/70 border border-zinc-800/80 p-5 rounded-2xl flex flex-col gap-2 hover:border-zinc-700 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-lg">
-              ⏱️
-            </div>
-            <h4 className="font-bold text-sm text-zinc-100">{t.f1_title}</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">{t.f1_desc}</p>
-          </div>
+      {/* 3 CARACTERÍSTICAS TÉCNICAS EN BENTO FOOTER */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4">
+        <div className="p-5 rounded-3xl bg-zinc-900/40 border-2 border-zinc-800/80 hover:border-zinc-700 transition-all">
+          <div className="text-2xl mb-2">🎯</div>
+          <h3 className="text-sm font-black uppercase text-white mb-1">
+            {lang === "es"
+              ? "Hook & Drop-off Detection"
+              : "Hook & Drop-off Detection"}
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            {lang === "es"
+              ? "Localiza caídas críticas de retención en la línea temporal con precisión de décimas de segundo."
+              : "Spot critical audience drop-offs in the timeline down to the exact second."}
+          </p>
+        </div>
 
-          <div className="bg-zinc-900/70 border border-zinc-800/80 p-5 rounded-2xl flex flex-col gap-2 hover:border-zinc-700 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-lg">
-              🧰
-            </div>
-            <h4 className="font-bold text-sm text-zinc-100">{t.f2_title}</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">{t.f2_desc}</p>
-          </div>
+        <div className="p-5 rounded-3xl bg-zinc-900/40 border-2 border-zinc-800/80 hover:border-zinc-700 transition-all">
+          <div className="text-2xl mb-2">🔥</div>
+          <h3 className="text-sm font-black uppercase text-white mb-1">
+            {lang === "es" ? "Modo Bro Roast" : "Bro Roast Mode"}
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            {lang === "es"
+              ? "Opinión sin filtros de director senior con jerga real de editor para mejorar el ritmo de edición."
+              : "No-BS critique with viral editor slang to upgrade your pacing fast."}
+          </p>
+        </div>
 
-          <div className="bg-zinc-900/70 border border-zinc-800/80 p-5 rounded-2xl flex flex-col gap-2 hover:border-zinc-700 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-lg">
-              🔥
-            </div>
-            <h4 className="font-bold text-sm text-zinc-100">{t.f3_title}</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">{t.f3_desc}</p>
-          </div>
-
-          <div className="bg-zinc-900/70 border border-zinc-800/80 p-5 rounded-2xl flex flex-col gap-2 hover:border-zinc-700 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-lg">
-              👾
-            </div>
-            <h4 className="font-bold text-sm text-zinc-100">{t.f4_title}</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">{t.f4_desc}</p>
-          </div>
+        <div className="p-5 rounded-3xl bg-zinc-900/40 border-2 border-zinc-800/80 hover:border-zinc-700 transition-all">
+          <div className="text-2xl mb-2">🧰</div>
+          <h3 className="text-sm font-black uppercase text-white mb-1">
+            {lang === "es" ? "Kit de Assets Integrado" : "Instant Asset Kit"}
+          </h3>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            {lang === "es"
+              ? "Copia con un clic nombres de SFX, fuentes, efectos de transición y colores Hex ideales para tu clip."
+              : "One-click copy for SFX names, fonts, visual transitions, and Hex palettes tailored to your video."}
+          </p>
         </div>
       </div>
     </div>
