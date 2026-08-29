@@ -148,7 +148,7 @@ const responseSchema = {
 
 // Configuración del modelo en Vertex AI
 const generativeModel = vertexAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
+  model: "gemini-3.5-flash",
   generationConfig: {
     responseMimeType: "application/json",
     responseSchema: responseSchema,
@@ -228,11 +228,9 @@ app.post("/api/audit-video", upload.single("video"), async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
-    res
-      .status(500)
-      .json({
-        error: error.message || "Error al auditar el video en Vertex AI",
-      });
+    res.status(500).json({
+      error: error.message || "Error al auditar el video en Vertex AI",
+    });
   }
 });
 
