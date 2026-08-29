@@ -177,8 +177,10 @@ export default function VideoAuditWorkspace({
     formData.append("video", videoFile);
     formData.append("language", lang);
 
+    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
     try {
-      const res = await fetch("http://localhost:5000/api/audit-video", {
+      const res = await fetch(`${API_BASE}/api/audit-video`, {
         method: "POST",
         body: formData,
       });
