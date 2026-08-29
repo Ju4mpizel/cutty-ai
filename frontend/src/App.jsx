@@ -12,14 +12,14 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const MAX_SIZE_MB = 50;
+    const MAX_SIZE_MB = 30;
     const fileSizeMB = file.size / (1024 * 1024);
 
     if (fileSizeMB > MAX_SIZE_MB) {
       alert(
         lang === "es"
-          ? `⚠️ El video pesa ${fileSizeMB.toFixed(1)}MB.\n\nPara un análisis óptimo con Gemini, el tamaño máximo permitido es de ${MAX_SIZE_MB}MB.\nPor favor comprímelo o sube un clip más corto.`
-          : `⚠️ Video size is ${fileSizeMB.toFixed(1)}MB.\n\nFor optimal Gemini analysis, maximum file size is ${MAX_SIZE_MB}MB.\nPlease compress it or upload a shorter clip.`,
+          ? `⚠️ El video pesa ${fileSizeMB.toFixed(1)}MB.\n\nPara un análisis en tiempo real con Gemini en Cloud Run, el tamaño máximo es de ${MAX_SIZE_MB}MB.\nPor favor comprímelo o sube un clip más corto (720p / 1080p optimizado).`
+          : `⚠️ Video size is ${fileSizeMB.toFixed(1)}MB.\n\nFor real-time Gemini analysis on Cloud Run, the maximum file size is ${MAX_SIZE_MB}MB.\nPlease compress it or upload a shorter clip.`,
       );
       e.target.value = "";
       return;
