@@ -177,21 +177,39 @@ export default function VideoAuditWorkspace({
     formData.append("video", videoFile);
     formData.append("language", lang);
 
-    const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_BASE =
+      import.meta.env.VITE_API_URL ||
+      "https://cutty-backend-747715483985.us-central1.run.app";
 
     try {
       const res = await fetch(`${API_BASE}/api/audit-video`, {
         method: "POST",
         body: formData,
       });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(
+          errJson.details || errJson.error || `HTTP ${res.status}`,
+        );
+      }
+
       const data = await res.json();
       setAuditData(data);
+
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
     } catch (err) {
       console.error(err);
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
       alert(
         lang === "es"
-          ? "Error al auditar el video. Backend no responde."
-          : "Error auditing video. Backend not responding.",
+          ? `Error al auditar el video: ${err.message}`
+          : `Error auditing video: ${err.message}`,
       );
     } finally {
       setIsAuditing(false);

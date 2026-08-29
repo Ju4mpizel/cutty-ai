@@ -10,10 +10,23 @@ export default function App() {
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setVideoFile(file);
-      setVideoUrl(URL.createObjectURL(file));
+    if (!file) return;
+
+    const MAX_SIZE_MB = 20;
+    const fileSizeMB = file.size / (1024 * 1024);
+
+    if (fileSizeMB > MAX_SIZE_MB) {
+      alert(
+        lang === "es"
+          ? `⚠️ El video pesa ${fileSizeMB.toFixed(1)}MB.\n\nPara un análisis instantáneo con Gemini 3.5, el tamaño máximo permitido es de ${MAX_SIZE_MB}MB.\nPor favor comprímelo o sube un clip más corto.`
+          : `⚠️ Video size is ${fileSizeMB.toFixed(1)}MB.\n\nFor instant Gemini 3.5 analysis, maximum file size is ${MAX_SIZE_MB}MB.\nPlease compress it or upload a shorter clip.`,
+      );
+      e.target.value = "";
+      return;
     }
+
+    setVideoFile(file);
+    setVideoUrl(URL.createObjectURL(file));
   };
 
   const handleReset = () => {
