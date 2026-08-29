@@ -12,14 +12,14 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const MAX_SIZE_MB = 20;
+    const MAX_SIZE_MB = 50;
     const fileSizeMB = file.size / (1024 * 1024);
 
     if (fileSizeMB > MAX_SIZE_MB) {
       alert(
         lang === "es"
-          ? `⚠️ El video pesa ${fileSizeMB.toFixed(1)}MB.\n\nPara un análisis instantáneo con Gemini 3.5, el tamaño máximo permitido es de ${MAX_SIZE_MB}MB.\nPor favor comprímelo o sube un clip más corto.`
-          : `⚠️ Video size is ${fileSizeMB.toFixed(1)}MB.\n\nFor instant Gemini 3.5 analysis, maximum file size is ${MAX_SIZE_MB}MB.\nPlease compress it or upload a shorter clip.`,
+          ? `⚠️ El video pesa ${fileSizeMB.toFixed(1)}MB.\n\nPara un análisis óptimo con Gemini, el tamaño máximo permitido es de ${MAX_SIZE_MB}MB.\nPor favor comprímelo o sube un clip más corto.`
+          : `⚠️ Video size is ${fileSizeMB.toFixed(1)}MB.\n\nFor optimal Gemini analysis, maximum file size is ${MAX_SIZE_MB}MB.\nPlease compress it or upload a shorter clip.`,
       );
       e.target.value = "";
       return;
@@ -55,7 +55,7 @@ export default function App() {
 
       {/* Footer Minimalista */}
       <footer className="border-t border-zinc-900/80 py-5 text-center text-xs text-zinc-500 font-mono">
-        Cutty AI • AI Video Director Copilot • Powered by Google Gemini 3.6
+        Cutty AI • AI Video Director Copilot • Powered by Google Gemini 3.5
         Flash
       </footer>
     </div>
